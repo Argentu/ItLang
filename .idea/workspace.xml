@@ -1,25 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c102a8ea-99b3-43f1-bbb2-7661a0c82ed3" name="Changes" comment="init comit">
-      <change afterPath="$PROJECT_DIR$/account/migrations/0002_blog.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/account/migrations/0003_auto_20220615_1917.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/account/migrations/0004_auto_20220616_2051.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/edu/migrations/0002_delete_blog.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/edu/migrations/0003_auto_20220616_2051.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/materials/migrations/0003_auto_20220616_2051.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="c102a8ea-99b3-43f1-bbb2-7661a0c82ed3" name="Changes" comment="no djoser">
       <change beforePath="$PROJECT_DIR$/ItLang/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ItLang/settings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/account/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/edu/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/edu/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/edu/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/edu/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/materials/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/materials/models.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -128,7 +111,7 @@
       <workItem from="1655284288044" duration="337000" />
       <workItem from="1655288744198" duration="7752000" />
       <workItem from="1655366579829" duration="27000" />
-      <workItem from="1655396718026" duration="4364000" />
+      <workItem from="1655396718026" duration="4554000" />
     </task>
     <task id="LOCAL-00001" summary="refactor">
       <created>1654334696581</created>
@@ -179,7 +162,14 @@
       <option name="project" value="LOCAL" />
       <updated>1655284460294</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="no djoser">
+      <created>1655455152108</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1655455152108</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -203,6 +193,7 @@
     <MESSAGE value="add crutches" />
     <MESSAGE value="many changes" />
     <MESSAGE value="init comit" />
-    <option name="LAST_COMMIT_MESSAGE" value="init comit" />
+    <MESSAGE value="no djoser" />
+    <option name="LAST_COMMIT_MESSAGE" value="no djoser" />
   </component>
 </project>
