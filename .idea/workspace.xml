@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c102a8ea-99b3-43f1-bbb2-7661a0c82ed3" name="Changes" comment="no djoser">
+    <list default="true" id="c102a8ea-99b3-43f1-bbb2-7661a0c82ed3" name="Changes" comment="static root">
       <change beforePath="$PROJECT_DIR$/ItLang/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/ItLang/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -111,7 +111,7 @@
       <workItem from="1655284288044" duration="337000" />
       <workItem from="1655288744198" duration="7752000" />
       <workItem from="1655366579829" duration="27000" />
-      <workItem from="1655396718026" duration="4554000" />
+      <workItem from="1655396718026" duration="4680000" />
     </task>
     <task id="LOCAL-00001" summary="refactor">
       <created>1654334696581</created>
@@ -169,7 +169,14 @@
       <option name="project" value="LOCAL" />
       <updated>1655455152108</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="static root">
+      <created>1655455339382</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1655455339382</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -194,6 +201,7 @@
     <MESSAGE value="many changes" />
     <MESSAGE value="init comit" />
     <MESSAGE value="no djoser" />
-    <option name="LAST_COMMIT_MESSAGE" value="no djoser" />
+    <MESSAGE value="static root" />
+    <option name="LAST_COMMIT_MESSAGE" value="static root" />
   </component>
 </project>
