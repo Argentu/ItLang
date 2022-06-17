@@ -1,5 +1,13 @@
 from django.db.models import *
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
+from hashlib import sha1
+from datetime import datetime
+
+
+def upload_image(instance, filename):
+    return f'images/' \
+           f'{datetime.today().date()}/' \
+           f'{sha1((filename + str(datetime.now())).encode("UTF-8")).hexdigest() + "." + filename.split(".")[-1]}'
 
 
 class Users(AbstractUser, PermissionsMixin):
@@ -14,8 +22,8 @@ class Users(AbstractUser, PermissionsMixin):
         ('6', 'C2 Proficiency'),
         ('7', 'Undefined')]
 
-    first_name = CharField(max_length=15, default='blank', db_index=True)
-    last_name = CharField(max_length=15, default='blank', db_index=True)
+    first_name = CharField(max_length=15, db_index=True)
+    last_name = CharField(max_length=15, db_index=True)
     username = CharField(max_length=15, unique=True, db_index=True)
     email = EmailField(unique=True, db_index=True)
     password = CharField(max_length=500)
@@ -38,3 +46,9 @@ class Users(AbstractUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.username
+
+
+class Blog(Model):
+    user = ForeignKey(Users, default=1, on_delete=SET_DEFAULT)
+    text = TextField()
+    image = ImageField(upload_to=upload_image)

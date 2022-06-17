@@ -53,53 +53,6 @@ class EditCourseSerializer(CreateCourseSerializer):
         return instance
 
 
-# Done
-class CreateThemeSerializer(ModelSerializer):
-    theme_name = CF(max_length=25,
-                    label='Theme name')
-    description = CF(label='Description')
-    preview = IF(label='Preview')
-
-    class Meta:
-        model = Themes
-        fields = 'theme_name', 'description', 'preview'
-
-    def validate(self, data):
-        if data.get('theme_name') and data.get('description'):
-            return data
-        else:
-            return ValidationError('Name and description should not be blank')
-
-    def create(self, validated_data):
-        theme_name = validated_data.get('theme_name')
-        description = validated_data.get('description')
-        preview = validated_data.get('preview')
-        course_id = self.context['course_id']
-        theme = Themes.objects.create(theme_name=theme_name, description=description, preview=preview,
-                                      course_id=course_id)
-        theme.save()
-        return theme
-
-
-# Done
-class EditThemeSerializer(CreateThemeSerializer):
-    description = CF(label='Description', required=False)
-    preview = IF(label='Preview', required=False)
-
-    def validate(self, data, *args, **kwargs):
-        if data.get('theme_name'):
-            return data
-        else:
-            return ValidationError('Name should not be blank')
-
-    def update(self, instance, validated_data):
-        instance.theme_name = validated_data.get('theme_name', instance.theme_name)
-        instance.description = validated_data.get('description', instance.description)
-        instance.preview = validated_data.get('preview', instance.preview)
-        instance.save()
-        return instance
-
-
 class hide:
     def __init__(self, type, description, text):
         self.type = type
@@ -117,7 +70,7 @@ class CreateLessonSerializer(ModelSerializer):
     type = Choice(choices=LESSON_TYPES, default=1, label='Chose lesson type')
     description = CF(max_length=40, required=True,
                      label='Meta info for lesson (e.g. "1.3 Present simple")', )
-    text = CF(validators=[UniqueValidator(queryset=Text.objects.all())])
+    text = CF(validators=[UniqueValidator(queryset=Lessons.objects.all())], required=True)
     image = ListField(label='Image files', required=False, child=IF())
     audio = ListField(label='Audio files', required=False, child=FF())
     video = ListField(label='Video files', required=False, child=FF())
@@ -136,15 +89,11 @@ class CreateLessonSerializer(ModelSerializer):
     def create(self, validated_data):
         type = validated_data.get('type')
         description = validated_data.get('description')
-        theme_id = self.context['theme_id']
+        course_id = self.context['course_id']
+        text = validated_data.get('text')
 
         lesson: Lessons = Lessons.objects.create(description=description, type=type,
-                                                 theme_id=theme_id)
-
-        text = validated_data.get('text')
-        text_info = Text.objects.create(text=text)
-        lesson.text_material_for_lesson.add(text_info)
-        less = hide(type=type, description=description, text=text)
+                                                 course=course_id, text=text)
 
         if validated_data.get('image'):
             for img in validated_data.pop('image'):
@@ -159,7 +108,7 @@ class CreateLessonSerializer(ModelSerializer):
                 video_info = Video.objects.create(video=vid)
                 lesson.video_material_for_lesson.add(video_info)
         lesson.save()
-        return less
+        return lesson
 
 
 class CreateTestSerializer(ModelSerializer):
@@ -167,7 +116,7 @@ class CreateTestSerializer(ModelSerializer):
     preview = IF(label='Preview')
 
     class Meta:
-        model = Themes
+        model = Tests
         fields = 'description', 'preview'
 
     def validate(self, data):
@@ -187,19 +136,14 @@ class CreateTestSerializer(ModelSerializer):
 
 # ================Get serializers==========================
 
+
 class GetCoursesSerializer(ModelSerializer):
     class Meta:
         model = Courses
         fields = 'pk', 'course_name', 'description', 'preview'
 
 
-class GetThemesSerializer(ModelSerializer):
-    class Meta:
-        model = Themes
-        fields = 'theme_name', 'description', 'preview'
-
-
 class GetLessonsSerializer(ModelSerializer):
     class Meta:
         model = Lessons
-        fields = 'pk', 'description'
+        fields = 'pk', 'descriptions'

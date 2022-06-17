@@ -1,4 +1,4 @@
-from rest_framework.serializers import CharField as CF, EmailField as EF
+from rest_framework.serializers import CharField as CF, EmailField as EF, ImageField as IM
 from rest_framework.validators import UniqueValidator
 from .models import *
 from rest_framework.serializers import *
@@ -139,3 +139,13 @@ class RegisterAdminSerializer(UserSerializer):
             return user
         except Exception as e:
             return e
+
+
+class CreateBlogSerializer(ModelSerializer):
+    txt = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Text')
+    img = IM(label='Preview')
+
+    def validate(self, attrs):
+        pass
+
+

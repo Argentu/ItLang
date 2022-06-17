@@ -24,6 +24,7 @@ class Tasks(Model):
     variants = CharField(max_length=15)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
+    text = TextField(default='Lorem ipsum')
 
     lesson = ManyToManyField(Lessons, related_name='tasks_for_lessons')
     test = ManyToManyField(Tests, related_name='tasks_for_tests')
@@ -31,14 +32,6 @@ class Tasks(Model):
 
 # Materials
 # --------------------------------------------------
-class Text(Model):
-    text = TextField()
-    creation_time = DateTimeField(auto_now_add=True)
-    upd_time = DateTimeField(auto_now=True)
-
-    lesson = ManyToManyField(Lessons, related_name='text_material_for_lesson')
-    task = ManyToManyField(Tasks, related_name='text_material_for_task')
-
 
 class Audio(Model):
     sound = FileField(upload_to=upload_audio)

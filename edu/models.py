@@ -1,14 +1,6 @@
 from django.db.models import *
 from account.models import *
 from django.core.validators import MinValueValidator, MaxValueValidator
-from hashlib import sha1
-from datetime import datetime
-
-
-def upload_image(instance, filename):
-    return f'images/' \
-           f'{datetime.today().date()}/' \
-           f'{sha1((filename + str(datetime.now())).encode("UTF-8")).hexdigest() + "." + filename.split(".")[-1]}'
 
 
 class Courses(Model):
@@ -21,13 +13,6 @@ class Courses(Model):
     users = ManyToManyField(Users, through='User2Course')
 
 
-class Themes(Model):
-    theme_name = CharField(max_length=25)
-    description = TextField(blank=True)
-    preview = ImageField(upload_to=upload_image, blank=True)
-    course = ForeignKey(Courses, on_delete=CASCADE)
-
-
 class Lessons(Model):
     LESSON_TYPES = [
         ('1', 'Text'),
@@ -37,9 +22,10 @@ class Lessons(Model):
     ]
     description = CharField(max_length=40)
     type = CharField(choices=LESSON_TYPES, default='1', max_length=1)
-    theme = ForeignKey(Themes, on_delete=CASCADE)
+    course = ForeignKey(Courses, on_delete=CASCADE, default=1)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
+    text = TextField(default='Lorem ipsum')
 
     result = ManyToManyField(Users, through='Result')
 
@@ -57,12 +43,6 @@ class Tests(Model):
 
     courses = ManyToManyField(Courses, related_name='test_for_course')
     en_lvl = ManyToManyField(Users, through='En_lvl_results')
-
-
-class blog(Model):
-    users = ManyToManyField(Users)
-    text = TextField()
-    image = FileField()
 
 
 # ==================================================
@@ -83,8 +63,8 @@ class User2Course(Model):
 
 
 class Result(Model):
-    user_tb = ForeignKey(Users, on_delete=CASCADE)
-    lesson_tb = ForeignKey(Lessons, on_delete=CASCADE, related_name='intermediate_tb_for_lessons_results')
+    user = ForeignKey(Users, on_delete=CASCADE)
+    lesson = ForeignKey(Lessons, on_delete=CASCADE, related_name='intermediate_tb_for_lessons_results')
     is_finished = BooleanField(default=False)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)

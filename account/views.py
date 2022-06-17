@@ -34,7 +34,7 @@ class RegisterApi(CreateAPIView):
 
 
 class RegisterAdminApi(RegisterApi):
-    permission_classes = [IsAuthenticated, IsSuperUser]
+    permission_classes = IsAuthenticated, IsSuperUser
     queryset = Users.objects.all()
     serializer_class = RegisterAdminSerializer
 
@@ -50,3 +50,11 @@ class EditUserDataApi(RetrieveUpdateAPIView):
         serializer.is_valid()
         serializer.save()
         return Response({"changes": serializer.data})
+
+
+class CreateBlogApi(CreateAPIView):
+    permission_classes = IsAuthenticated, IsAdminUser
+    queryset = Blog.objects.all()
+
+    def get_serializer_context(self):
+        return {'user_id': get_user_id_from_token(self.request)}

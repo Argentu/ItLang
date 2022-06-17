@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework',
     'corsheaders',
-    'djoser',
 
     'account.apps.AccountConfig',
     'edu.apps.EduConfig',
