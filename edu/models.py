@@ -27,22 +27,12 @@ class Lessons(Model):
     upd_time = DateTimeField(auto_now=True)
     text = TextField(default='Lorem ipsum')
 
-    result = ManyToManyField(Users, through='Result')
-
 
 class Tests(Model):
-    TEST_TYPES = [
-        ('1', 'English level'),
-        ('2', 'Exam for course')
-    ]
-    type = CharField(choices=TEST_TYPES, max_length=1)
     description = TextField(max_length=70)
-    preview = ImageField(upload_to=upload_image, blank=True)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
-
-    courses = ManyToManyField(Courses, related_name='test_for_course')
-    en_lvl = ManyToManyField(Users, through='En_lvl_results')
+    lesson = OneToOneField(Lessons, on_delete=CASCADE)
 
 
 # ==================================================
@@ -64,16 +54,8 @@ class User2Course(Model):
 
 class Result(Model):
     user = ForeignKey(Users, on_delete=CASCADE)
-    lesson = ForeignKey(Lessons, on_delete=CASCADE, related_name='intermediate_tb_for_lessons_results')
+    test = ForeignKey(Tests, on_delete=CASCADE, related_name='results_for_lesson')
     is_finished = BooleanField(default=False)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
 
-
-class En_lvl_results(Model):
-    user_tb = ForeignKey(Users, on_delete=CASCADE)
-    test_tb = ForeignKey(Tests, on_delete=CASCADE)
-    result = PositiveSmallIntegerField(validators=[MinValueValidator(0),
-                                                   MaxValueValidator(120)])
-    creation_time = DateTimeField(auto_now_add=True)
-    upd_time = DateTimeField(auto_now=True)

@@ -18,15 +18,13 @@ class Tasks(Model):
         ('1', 'Test with 1 answer'),
         ('2', 'Test with many answers'),
         ('3', 'Translate word/phrase'),
-    )
+        )
     type = CharField(choices=TASK_TYPES, default='1', max_length=1)
     answer = CharField(max_length=500)
     variants = CharField(max_length=15)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
     text = TextField(default='Lorem ipsum')
-
-    lesson = ManyToManyField(Lessons, related_name='tasks_for_lessons')
     test = ManyToManyField(Tests, related_name='tasks_for_tests')
 
 

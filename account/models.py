@@ -12,23 +12,12 @@ def upload_image(instance, filename):
 
 class Users(AbstractUser, PermissionsMixin):
     # main fields
-    EN_LVL = [
-        ('0', 'Pre-A1 Beginner'),
-        ('1', 'A1 Elementary'),
-        ('2', 'A2 Pre-Intermediate'),
-        ('3', 'B1 Intermediate'),
-        ('4', 'B2 Upper-Intermediate'),
-        ('5', 'C1 Advanced'),
-        ('6', 'C2 Proficiency'),
-        ('7', 'Undefined')]
-
     first_name = CharField(max_length=15, db_index=True)
     last_name = CharField(max_length=15, db_index=True)
     username = CharField(max_length=15, unique=True, db_index=True)
     email = EmailField(unique=True, db_index=True)
     password = CharField(max_length=500)
     upd_time = DateTimeField(auto_now=True)
-    en_lvl = CharField(choices=EN_LVL, default='7', max_length=1)
     group = CharField(max_length=10)
 
     # admin fields

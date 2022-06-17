@@ -1,10 +1,16 @@
 from rest_framework.serializers import *
 from rest_framework.serializers import CharField as CF, \
-    ImageField as IF, ChoiceField as Choice, \
-    FileField as FF, ListField
+    ImageField as IF, ChoiceField as Choice,\
+    ListField, DictField as DF
 from rest_framework.validators import UniqueValidator
-
+from base64 import b64encode
 from materials.models import *
+
+
+def convert_to_txt(file_path):
+    with open(file_path, "rb") as file:
+        file = b64encode(file.read()).decode('utf-8')
+    return file
 
 
 # Done
@@ -36,14 +42,12 @@ class CreateCourseSerializer(ModelSerializer):
 
 # Done
 class EditCourseSerializer(CreateCourseSerializer):
+    course_name = CF(label='Course_name', required=False)
     description = CF(label='Description', required=False)
     preview = IF(label='Preview', required=False)
 
     def validate(self, data, *args, **kwargs):
-        if data.get('course_name'):
-            return data
-        else:
-            return ValidationError('Name should not be blank')
+        return data
 
     def update(self, instance, validated_data):
         instance.course_name = validated_data.get('course_name', instance.course_name)
@@ -51,13 +55,6 @@ class EditCourseSerializer(CreateCourseSerializer):
         instance.preview = validated_data.get('preview', instance.preview)
         instance.save()
         return instance
-
-
-class hide:
-    def __init__(self, type, description, text):
-        self.type = type
-        self.description = description
-        self.text = text
 
 
 class CreateLessonSerializer(ModelSerializer):
@@ -72,8 +69,9 @@ class CreateLessonSerializer(ModelSerializer):
                      label='Meta info for lesson (e.g. "1.3 Present simple")', )
     text = CF(validators=[UniqueValidator(queryset=Lessons.objects.all())], required=True)
     image = ListField(label='Image files', required=False, child=IF())
-    audio = ListField(label='Audio files', required=False, child=FF())
-    video = ListField(label='Video files', required=False, child=FF())
+
+    # audio = ListField(label='Audio files', required=False, child=FF())
+    # video = ListField(label='Video files', required=False, child=FF())
 
     class Meta:
         model = Lessons
@@ -89,35 +87,80 @@ class CreateLessonSerializer(ModelSerializer):
     def create(self, validated_data):
         type = validated_data.get('type')
         description = validated_data.get('description')
-        course_id = self.context['course_id']
+        course_id = Courses.objects.get(pk=self.context['course_id'])
         text = validated_data.get('text')
 
-        lesson: Lessons = Lessons.objects.create(description=description, type=type,
-                                                 course=course_id, text=text)
+        lesson = Lessons.objects.create(description=description, type=type,
+                                        course=course_id, text=text)
 
         if validated_data.get('image'):
             for img in validated_data.pop('image'):
                 img_info = Image.objects.create(image=img)
                 lesson.image_material_for_lesson.add(img_info)
-        if validated_data.get('audio'):
-            for aud in validated_data.pop('audio'):
-                audio_info = Audio.objects.create(sound=aud)
-                lesson.audio_material_for_lesson.add(audio_info)
-        if validated_data.get('video'):
-            for vid in validated_data.pop('video'):
-                video_info = Video.objects.create(video=vid)
-                lesson.video_material_for_lesson.add(video_info)
+        # if validated_data.get('audio'):
+        #     for aud in validated_data.pop('audio'):
+        #         audio_info = Audio.objects.create(sound=aud)
+        #         lesson.audio_material_for_lesson.add(audio_info)
+        # if validated_data.get('video'):
+        #     for vid in validated_data.pop('video'):
+        #         video_info = Video.objects.create(video=vid)
+        #         lesson.video_material_for_lesson.add(video_info)
         lesson.save()
         return lesson
 
 
+# TOD
+# class EditLessonSerializer(ModelSerializer):
+#     LESSON_TYPES = [
+#         ('1', 'Text'),
+#         ('2', 'Audio'),
+#         ('3', 'Video'),
+#         ('4', 'Image')
+#     ]
+#     type = Choice(choices=LESSON_TYPES, default=1, label='Chose lesson type')
+#     description = CF(max_length=40, required=True,
+#                      label='Meta info for lesson (e.g. "1.3 Present simple")', )
+#     text = CF(validators=[UniqueValidator(queryset=Lessons.objects.all())], required=True)
+#     image = ListField(label='Image files', required=False, child=IF())
+#
+#     def validate(self, data):
+#         return data
+#
+#     def update(self, instance, validated_data):
+#         instance.type = validated_data.get('type', instance.type)
+#         instance.description = validated_data.get('description', instance.description)
+#         instance.text = validated_data.get('text', instance.text)
+#         instance.type = validated_data.get('type', instance.type)
+#
+#         type = validated_data.get('type')
+#         description = validated_data.get('description')
+#         course_id = Courses.objects.get(pk=self.context['course_id'])
+#         text = validated_data.get('text')
+#         lesson = Lessons.objects.create(description=description, type=type,
+#                                                  course=course_id, text=text)
+#         if validated_data.get('image'):
+#             if len(validated_data.get('image'))==len(instance.image_material_for_lesson.all()):
+#                 for i, k in zip(instance.image_material_for_lesson.all(), validated_data.get('image')):
+#                     i.image = k
+#             elif len(validated_data.get('image'))>len(instance.image_material_for_lesson.all()):
+#                 counter = 0
+#                 for i in validated_data.get('image'):
+#                     if
+#
+#             for img in validated_data.pop('image'):
+#                 img_info = Image.objects.create(image=img)
+#                 lesson.image_material_for_lesson.add(img_info)
+#         lesson.save()
+#         return lesson
+
+
 class CreateTestSerializer(ModelSerializer):
     description = CF(label='Description')
-    preview = IF(label='Preview')
+    tasks: DF()
 
     class Meta:
         model = Tests
-        fields = 'description', 'preview'
+        fields = 'description', 'tasks'
 
     def validate(self, data):
         if data.get('description'):
@@ -127,12 +170,17 @@ class CreateTestSerializer(ModelSerializer):
 
     def create(self, validated_data):
         description = validated_data.get('description')
-        preview = validated_data.get('preview')
-        course_id = self.context['course_id']
-        test = Tests.objects.create(description=description, preview=preview,
-                                    course_id=course_id)
+        lesson_id = self.context['lesson_id']
+        test = Tests.objects.create(description=description, lesson_id=lesson_id)
+        for i in validated_data.get('tasks'):
+            task = Tasks.objects.create(type=i.get('type'), text=i.get('text'),
+                                        variants='-+=+-'.join(i.get('var')),
+                                        answer=i.get('ans'))
+        test.tasks_for_tests.add(task)
         test.save()
         return test
+
+
 
 # ================Get serializers==========================
 
@@ -146,4 +194,4 @@ class GetCoursesSerializer(ModelSerializer):
 class GetLessonsSerializer(ModelSerializer):
     class Meta:
         model = Lessons
-        fields = 'pk', 'descriptions'
+        fields = 'pk', 'descriptions',
