@@ -1,4 +1,3 @@
-from base64 import b64encode
 from rest_framework.generics import *
 from rest_framework.parsers import *
 from rest_framework.permissions import *
@@ -6,12 +5,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import *
-
-
-def convert_to_txt(file_path):
-    with open(file_path, "rb") as file:
-        file = b64encode(file.read()).decode('utf-8')
-    return file
 
 
 # Done

@@ -1,7 +1,6 @@
 from rest_framework.serializers import CharField as CF, EmailField as EF, ImageField as IM
 from rest_framework.validators import UniqueValidator
-from .models import Users, Blog
-from edu.models import Courses, User2Course
+from materials.models import *
 from rest_framework.serializers import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import re
