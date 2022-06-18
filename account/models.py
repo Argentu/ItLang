@@ -8,7 +8,7 @@ def upload_image(instance, filename):
     now = f'{datetime.today().date()}{datetime.today().time().hour}{datetime.today().time().minute}{datetime.today().time().second}'
     return f'images/' \
            f'{datetime.today().date()}/' \
-           f'{sha1(filename + now.encode("UTF-8")).hexdigest() + "." + filename.split(".")[-1]}'
+           f'{sha1((filename+now).encode("UTF-8")).hexdigest() + "." + filename.split(".")[-1]}'
 
 
 class Users(AbstractUser, PermissionsMixin):
