@@ -36,9 +36,12 @@ class CreateCourseSerializer(ModelSerializer):
         description = validated_data.get('description')
         preview = validated_data.get('preview')
         course = Courses.objects.create(course_name=course_name, description=description, preview=preview)
-        for i in Users.objects.all():
-            rel = User2Course.objects.create(course_tb=course, user_tb=i)
-            rel.save()
+        if Users.objects.all():
+            for i in Users.objects.all():
+                rel = User2Course.objects.create(course_tb=course, user_tb=i)
+                rel.save()
+        else:
+            pass
         course.save()
         return course
 

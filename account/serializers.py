@@ -62,9 +62,12 @@ class UserSerializer(ModelSerializer):
         user = Users.objects.create(username=username, first_name=first_name,
                                     last_name=last_name, email=email, group=group)
         user.set_password(password)
-        for i in Courses.objects.all():
-            rel = User2Course.objects.create(user_tb=user, course_tb=i)
-            rel.save()
+        if Courses.objects.all():
+            for i in Courses.objects.all():
+                rel = User2Course.objects.create(user_tb=user, course_tb=i)
+                rel.save()
+        else:
+            pass
         user.save()
         return user
 
