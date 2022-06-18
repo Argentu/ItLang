@@ -1,6 +1,7 @@
 from rest_framework.serializers import CharField as CF, EmailField as EF, ImageField as IM
 from rest_framework.validators import UniqueValidator
-from .models import *
+from .models import Users, Blog
+from edu.models import Courses, User2Course
 from rest_framework.serializers import *
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import re
@@ -9,7 +10,6 @@ import re
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
-        print(cls, user)
         token = super(MyTokenObtainPairSerializer, cls).get_token(user)
         token['username'] = user.username
         return token
@@ -62,6 +62,9 @@ class UserSerializer(ModelSerializer):
         user = Users.objects.create(username=username, first_name=first_name,
                                     last_name=last_name, email=email, group=group)
         user.set_password(password)
+        for i in Courses.objects.all():
+            rel = User2Course.objects.create(user_tb=user, course_tb=i)
+            rel.save()
         user.save()
         return user
 
@@ -143,10 +146,24 @@ class RegisterAdminSerializer(UserSerializer):
 
 
 class CreateBlogSerializer(ModelSerializer):
+    name = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Name')
+    description = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Description')
     txt = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Text')
-    img = IM(label='Preview')
+    preview = IM(label='Paralax', required=True)
+    img = IM(label='Image', required=False)
 
-    def validate(self, attrs):
-        pass
+    def validate(self, data):
+        return data
+
+    def create(self, validated_data):
+        name = validated_data.get('name')
+        description = validated_data.get('description')
+        txt = validated_data.get('txt')
+        preview = validated_data.get('preview')
+        img = validated_data.get('img')
+        article = Blog.objects.create(name=name, description=description,
+                                      text=txt, paralax=preview, image=img)
+        article.save()
+        return article
 
 

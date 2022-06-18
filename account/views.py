@@ -27,7 +27,6 @@ class MyObtainTokenPairApi(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
 
 
-
 class RegisterApi(CreateAPIView):
     permission_classes = AllowAny,
     queryset = Users.objects.all()
@@ -59,3 +58,6 @@ class CreateBlogApi(CreateAPIView):
 
     def get_serializer_context(self):
         return {'user_id': get_user_id_from_token(self.request)}
+
+
+#class UpdateBlogApi

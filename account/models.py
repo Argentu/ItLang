@@ -38,6 +38,9 @@ class Users(AbstractUser, PermissionsMixin):
 
 
 class Blog(Model):
+    name = CharField(max_length=40)
+    description = TextField()
     user = ForeignKey(Users, default=1, on_delete=SET_DEFAULT)
     text = TextField()
+    paralax = ImageField(upload_to=upload_image)
     image = ImageField(upload_to=upload_image)

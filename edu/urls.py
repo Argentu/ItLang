@@ -6,12 +6,8 @@ urlpatterns = [
     path('edit/course/<int:pk>', UpdateCourseApi.as_view(), name='update_course'),
 
     path('create/lesson/<int:pk>', CreateLessonApi.as_view(), name='create_lesson'),
-    #path('edit/lesson/<int:pk>', UpdateLessonApi.as_view(), name='update_lesson'),
 
     path('get/courses', GetCoursesApi.as_view(), name='get_courses'),
     path('get/lessons', GetLessonsApi.as_view(), name='get_lessons'),
     path('get/lesson/<int:pk>', GetLessonApi.as_view(), name='get_lesson'),
-
-    path('create/test/<int:pk>', CreateTestApi.as_view(), name='create_test')
-
 ]

@@ -29,7 +29,6 @@ class Lessons(Model):
 
 
 class Tests(Model):
-    description = TextField(max_length=70)
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
     lesson = OneToOneField(Lessons, on_delete=CASCADE)
@@ -46,7 +45,7 @@ class User2Course(Model):
                                          validators=[MinValueValidator(0),
                                                      MaxValueValidator(100)])
     is_finished = BooleanField(default=False)
-    min_percent = PositiveSmallIntegerField(default=100,
+    min_percent = PositiveSmallIntegerField(default=80,
                                             validators=
                                             [MinValueValidator(50),
                                              MaxValueValidator(100)])

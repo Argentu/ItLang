@@ -32,21 +32,16 @@ class CreateLessonApi(CreateAPIView):
         return {'course_id': self.kwargs.get('pk')}
 
 
-class CreateTestApi(CreateAPIView):
-    # permission_classes = IsAdminUser
-    QuerySet = Tests.objects.all()
-    parser_classes = (MultiPartParser, FormParser,)
-    serializer_class = CreateTestSerializer
-
-    def get_serializer_context(self):
-        return {'lesson_id': self.kwargs.get('pk')}
-
-
-
 # Done
 class UpdateCourseApi(UpdateAPIView):
     # permission_classes = IsAdminUser,
     serializer_class = EditCourseSerializer
+
+    def get(self, *args, **kwargs):
+        lessons = []
+        for i in Lessons.objects.filter(course_id=kwargs.get('pk')):
+            lessons.append(i.description)
+        return Response(lessons)
 
     def put(self, request, *args, **kwargs):
         pk = kwargs.get('pk', None)
@@ -62,44 +57,17 @@ class UpdateCourseApi(UpdateAPIView):
         return Response({'PUT': serializer.data, 'ID': instance.pk})
 
 
-# class UpdateLessonApi(UpdateAPIView):
-#     # permission_classes = IsAdminUser
-#     serializer_class = EditLessonSerializer
-#     def put(self, request, *args, **kwargs):
-#         pk = kwargs.get('pk', None)
-#         if not pk:
-#             return Response({'Error': 'Method PUT not allowed'})
-#         try:
-#             instance = Lessons.objects.get(pk=pk)
-#         except:
-#             return Response({'Error': 'Object does not exist'})
-#         serializer = EditLessonSerializer(data=request.data, instance=instance)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response({'PUT': serializer.data, 'ID': instance.pk})
-
-
-class UpdateTestApi(UpdateAPIView):
-    permission_classes = IsAdminUser,
-
-
 # ================Get views==========================
 
 
-class GetCoursesApi(ListAPIView):
-    permission_classes = AllowAny,
-    queryset = Courses.objects.all()
-    serializer_class = GetCoursesSerializer
-
-
-class CustomRenderer(renderers.BaseRenderer):
-    media_type = 'image/png'
-    format = 'png'
-    charset = None
-    render_style = 'binary'
-
-    def render(self, data, media_type=None, renderer_context=None):
-        return data
+class GetCoursesApi(APIView):
+    def get(self, *args, **kwargs):
+        result = []
+        for i in Courses.objects.all():
+            result.append({'course_name': i.course_name,
+                           'description': i.description,
+                           'preview': convert_to_txt(i.preview.path)})
+        return Response(result)
 
 
 class GetLessonsApi(APIView):
@@ -120,10 +88,9 @@ class GetLessonApi(APIView):
     def get(self, *args, **kwargs):
         lesson_obj = Lessons.objects.get(pk=kwargs.get('pk'))
         img = [convert_to_txt(i.image.path) for i in lesson_obj.image_material_for_lesson.filter(lesson=lesson_obj)]
-        # audio = lesson_obj.audio_material_for_lesson.all()
-        # video = lesson_obj.video_material_for_lesson.all()
         return Response({'pk': lesson_obj.pk,
                          'type': lesson_obj.type,
                          'description': lesson_obj.description,
                          'text': lesson_obj.text,
                          'images': img})
+

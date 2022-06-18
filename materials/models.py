@@ -25,7 +25,7 @@ class Tasks(Model):
     creation_time = DateTimeField(auto_now_add=True)
     upd_time = DateTimeField(auto_now=True)
     text = TextField(default='Lorem ipsum')
-    test = ManyToManyField(Tests, related_name='tasks_for_tests')
+    test = ForeignKey(Tests, related_name='tasks_for_tests', on_delete=CASCADE)
 
 
 # Materials

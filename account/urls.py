@@ -9,6 +9,5 @@ urlpatterns = [
 
     path('login', MyObtainTokenPairApi.as_view(), name='token_obtain_pair'),
     path('login/refresh', TokenRefreshView.as_view(), name='token_refresh'),
-
-   # path('blog/create', )
+    path('create/blog', CreateBlogApi.as_view(), name='create_blog')
 ]
