@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c102a8ea-99b3-43f1-bbb2-7661a0c82ed3" name="Changes" comment="dcdcdfcdcd">
-      <change beforePath="$PROJECT_DIR$/account/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/account/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/edu/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/edu/views.py" afterDir="false" />
-    </list>
+    <list default="true" id="c102a8ea-99b3-43f1-bbb2-7661a0c82ed3" name="Changes" comment="dcdcdfcdcd" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -116,7 +113,7 @@
       <workItem from="1655366579829" duration="27000" />
       <workItem from="1655396718026" duration="38053000" />
       <workItem from="1655547674720" duration="12600000" />
-      <workItem from="1655568855353" duration="9482000" />
+      <workItem from="1655568855353" duration="9788000" />
     </task>
     <task id="LOCAL-00001" summary="refactor">
       <created>1654334696581</created>
@@ -223,7 +220,14 @@
       <option name="project" value="LOCAL" />
       <updated>1655586506199</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="dcdcdfcdcd">
+      <created>1655587068280</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1655587068280</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
