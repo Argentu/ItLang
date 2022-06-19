@@ -47,7 +47,7 @@ class UpdateCourseApi(UpdateAPIView):
         serializer = EditCourseSerializer(data=request.data, instance=instance)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response({'PUT': serializer.data, 'ID': instance.pk})
+        return Response({serializer.data})
 
 
 # ================Get views==========================

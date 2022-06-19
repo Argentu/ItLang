@@ -3,14 +3,7 @@ from rest_framework.serializers import CharField as CF, \
     ImageField as IF, ChoiceField as Choice,\
     ListField, DictField as DF
 from rest_framework.validators import UniqueValidator
-from base64 import b64encode
 from materials.models import *
-
-
-def convert_to_txt(file_path):
-    with open(file_path, "rb") as file:
-        file = b64encode(file.read()).decode('utf-8')
-    return file
 
 
 # Done
@@ -36,10 +29,10 @@ class CreateCourseSerializer(ModelSerializer):
         description = validated_data.get('description')
         preview = validated_data.get('preview')
         course = Courses.objects.create(course_name=course_name, description=description, preview=preview)
-        if Users.objects.all():
-            for i in Users.objects.all():
-                rel = User2Course.objects.create(course_tb=course, user_tb=i)
-                rel.save()
+
+        for i in Users.objects.all():
+            rel = User2Course.objects.create(course_tb=course, user_tb=i)
+            rel.save()
         else:
             pass
         course.save()

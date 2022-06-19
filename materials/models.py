@@ -1,5 +1,11 @@
+from base64 import b64encode
 from edu.models import *
 
+
+def convert_to_txt(file_path):
+    with open(file_path, "rb") as file:
+        file = b64encode(file.read()).decode('utf-8')
+    return file
 
 def upload_video(instance, filename):
     return f'videos/' \

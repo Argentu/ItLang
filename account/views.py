@@ -1,6 +1,6 @@
 from base64 import b64decode
 import json
-
+from rest_framework.views import APIView
 from rest_framework.generics import *
 from rest_framework.permissions import *
 from rest_framework.response import Response
@@ -43,21 +43,106 @@ class EditUserDataApi(RetrieveUpdateAPIView):
     permission_classes = IsAuthenticated,
     queryset = Users.objects.all()
 
+    def get(self, *args, **kwargs):
+        pk = kwargs.get('pk')
+        obj = Users.objects.get(pk=pk)
+        res = {
+            'username': obj.username,
+            'first_name': obj.first_name,
+            'last_name': obj.last_name,
+            'email': obj.email,
+            'group': obj.group,
+            'ava': convert_to_txt(obj.ava.path) if obj.ava else None
+        }
+        return Response(res)
+
     def put(self, request, *args, **kwargs):
         pk = get_user_id_from_token(request)
         instance = Users.objects.get(pk=pk)
         serializer = EditUserSerializer(data=request.data, instance=instance)
         serializer.is_valid()
         serializer.save()
-        return Response({"changes": serializer.data})
+        obj = Users.objects.get(pk=pk)
+        res = {
+            'username': obj.username,
+            'first_name': obj.first_name,
+            'last_name': obj.last_name,
+            'email': obj.email,
+            'group': obj.group,
+            'ava': convert_to_txt(obj.ava.path) if obj.ava else None
+        }
+        return Response(res)
 
 
 class CreateBlogApi(CreateAPIView):
-    permission_classes = IsAuthenticated, IsAdminUser
+    # permission_classes = IsAdminUser,
     queryset = Blog.objects.all()
-
-    def get_serializer_context(self):
-        return {'user_id': get_user_id_from_token(self.request)}
+    serializer_class = CreateBlogSerializer
 
 
-#class UpdateBlogApi
+class UpdateBlogApi(UpdateAPIView):
+    # permission_classes = IsAdminUser,
+    queryset = Blog.objects.all()
+    serializer_class = UpdateBlogSerializer
+
+    def get(self, *args, **kwargs):
+        pk = kwargs.get('pk')
+        obj = Blog.objects.get(pk=pk)
+        res = {
+            'name': obj.name,
+            'description': obj.description,
+            'text': obj.text,
+            'paralax': convert_to_txt(obj.paralax.path),
+            'image': convert_to_txt(obj.image.path) if obj.image else None
+        }
+        return Response(res)
+
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get('pk', None)
+        if not pk:
+            return Response({'Error': 'Method PUT not allowed'})
+        try:
+            instance = Blog.objects.get(pk=pk)
+        except:
+            return Response({'Error': 'Object does not exist'})
+        serializer = UpdateBlogSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        obj = Blog.objects.get(pk=pk)
+        res = {
+            'name': obj.name,
+            'description': obj.description,
+            'text': obj.text,
+            'paralax': convert_to_txt(obj.paralax.path),
+            'image': convert_to_txt(obj.image.path) if obj.image else None
+        }
+        return Response(res)
+
+
+class GetBlogsApi(APIView):
+    def get(self, *args, **kwargs):
+        obj = Blog.objects.all()
+        res = []
+        for i in obj:
+            res.append({
+                'id': i.pk,
+                'user': i.user.username,
+                'name': i.name,
+                'description': i.description,
+                'paralax': convert_to_txt(i.paralax.path),
+            })
+        return Response(res)
+
+
+class GetBlogApi(APIView):
+    def get(self, *args, **kwargs):
+        obj = Blog.objects.get(pk=kwargs.get('pk'))
+        res = {
+            'user': obj.user.username,
+            'name': obj.name,
+            'description': obj.description,
+            'paralax': convert_to_txt(obj.paralax.path),
+            'image': convert_to_txt(obj.image.path) if obj.image else None
+        }
+        return Response(res)

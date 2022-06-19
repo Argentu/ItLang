@@ -20,6 +20,7 @@ class Users(AbstractUser, PermissionsMixin):
     password = CharField(max_length=500)
     upd_time = DateTimeField(auto_now=True)
     group = CharField(max_length=10)
+    ava = ImageField(upload_to=upload_image)
 
     # admin fields
     is_superuser = BooleanField(default=False)
@@ -45,3 +46,4 @@ class Blog(Model):
     text = TextField()
     paralax = ImageField(upload_to=upload_image)
     image = ImageField(upload_to=upload_image)
+

@@ -29,10 +29,11 @@ class UserSerializer(ModelSerializer):
     password = CF(min_length=8, style={'input_type': 'password'}, write_only=True, label='Password')
     confirm = CF(min_length=8, style={'input_type': 'password'}, write_only=True, label='Confirm password')
     group = CF(max_length=10, label='Group (e.g. \'1-КТ-21\' or \'2-ІП/КТ-19\')')
+    ava = IM(label='User avatar', required=True)
 
     class Meta:
         model = Users
-        fields = 'username', 'first_name', 'last_name', 'email', 'password', 'confirm', 'group'
+        fields = 'username', 'first_name', 'last_name', 'email', 'password', 'confirm', 'group', 'ava'
 
     def validate(self, data):
         password = data.get('password')
@@ -57,14 +58,15 @@ class UserSerializer(ModelSerializer):
         email = validated_data.get('email')
         group = validated_data.get('group')
         password = validated_data.get('password')
+        ava = validated_data.get('ava')
 
         user = Users.objects.create(username=username, first_name=first_name,
-                                    last_name=last_name, email=email, group=group)
+                                    last_name=last_name, email=email, group=group, ava=ava)
         user.set_password(password)
-        if Courses.objects.all():
-            for i in Courses.objects.all():
-                rel = User2Course.objects.create(user_tb=user, course_tb=i)
-                rel.save()
+
+        for i in Courses.objects.all():
+            rel = User2Course.objects.create(user_tb=user, course_tb=i)
+            rel.save()
         else:
             pass
         user.save()
@@ -86,6 +88,7 @@ class EditUserSerializer(UserSerializer):
     password = CF(min_length=8, style={'input_type': 'password'}, write_only=True, label='Password', required=False)
     confirm = CF(min_length=8, style={'input_type': 'password'}, write_only=True, label='Confirm password', required=False)
     group = CF(max_length=10, label='Group (e.g. \'1-КТ-21\' or \'2-ІП/КТ-19\')', required=False)
+    ava = IM(label='User avatar', required=False)
 
     def validate(self, data):
         if data.get('password'):
@@ -110,6 +113,7 @@ class EditUserSerializer(UserSerializer):
         instance.email = validated_data.get('email', instance.email)
         instance.group = validated_data.get('group', instance.group)
         instance.password = validated_data.get('password', instance.password)
+        instance.ava = validated_data.get('ava', instance.ava)
         instance.save()
         return instance
 
@@ -119,7 +123,7 @@ class RegisterAdminSerializer(UserSerializer):
         model = Users
         fields = (
             'username', 'first_name', 'last_name',
-            'email', 'password', 'confirm_passwd'
+            'email', 'password', 'confirm_passwd', 'ava'
         )
 
     def validate(self, data):
@@ -136,10 +140,11 @@ class RegisterAdminSerializer(UserSerializer):
         last_name = validated_data.get('last_name')
         email = validated_data.get('email')
         password = validated_data.get('password')
+        ava = validated_data.get('ava')
         try:
             user = Users.objects.create(username=username, first_name=first_name,
                                         last_name=last_name, email=email, group='Admin',
-                                        is_staff=True)
+                                        is_staff=True, ava=ava)
             user.set_password(password)
             user.save()
             return user
@@ -150,9 +155,13 @@ class RegisterAdminSerializer(UserSerializer):
 class CreateBlogSerializer(ModelSerializer):
     name = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Name')
     description = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Description')
-    txt = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Text')
-    preview = IM(label='Paralax', required=True)
+    text = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=True, label='Text')
+    paralax = IM(label='Paralax', required=True)
     img = IM(label='Image', required=False)
+
+    class Meta:
+        model = Blog
+        fields = 'name', 'description', 'text', 'paralax', 'img'
 
     def validate(self, data):
         return data
@@ -160,12 +169,34 @@ class CreateBlogSerializer(ModelSerializer):
     def create(self, validated_data):
         name = validated_data.get('name')
         description = validated_data.get('description')
-        txt = validated_data.get('txt')
-        preview = validated_data.get('preview')
+        text = validated_data.get('text')
+        preview = validated_data.get('paralax')
         img = validated_data.get('img')
         article = Blog.objects.create(name=name, description=description,
-                                      text=txt, paralax=preview, image=img)
+                                      text=text, paralax=preview, image=img)
         article.save()
         return article
 
 
+class UpdateBlogSerializer(ModelSerializer):
+    name = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=False, label='Name')
+    description = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=False, label='Description')
+    text = CF(validators=[UniqueValidator(queryset=Blog.objects.all())], required=False, label='Text')
+    paralax = IM(label='Paralax', required=False)
+    img = IM(label='Image', required=False)
+
+    class Meta:
+        model = Blog
+        fields = 'name', 'description', 'text', 'paralax', 'img'
+
+    def validate(self, data):
+        return data
+
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get('description', instance.description)
+        instance.text = validated_data.get('text', instance.text)
+        instance.paralax = validated_data.get('paralax', instance.paralax)
+        instance.image = validated_data.get('img', instance.image)
+        instance.save()
+        return instance
