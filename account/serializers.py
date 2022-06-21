@@ -29,11 +29,10 @@ class UserSerializer(ModelSerializer):
     password = CF(min_length=8, style={'input_type': 'password'}, write_only=True, label='Password')
     confirm = CF(min_length=8, style={'input_type': 'password'}, write_only=True, label='Confirm password')
     group = CF(max_length=10, label='Group (e.g. \'1-КТ-21\' or \'2-ІП/КТ-19\')')
-    ava = IM(label='User avatar', required=True)
 
     class Meta:
         model = Users
-        fields = 'username', 'first_name', 'last_name', 'email', 'password', 'confirm', 'group', 'ava'
+        fields = 'username', 'first_name', 'last_name', 'email', 'password', 'confirm', 'group'
 
     def validate(self, data):
         password = data.get('password')
@@ -200,3 +199,5 @@ class UpdateBlogSerializer(ModelSerializer):
         instance.image = validated_data.get('img', instance.image)
         instance.save()
         return instance
+
+

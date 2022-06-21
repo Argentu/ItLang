@@ -41,20 +41,11 @@ class Tests(Model):
 class User2Course(Model):
     user_tb = ForeignKey(Users, on_delete=CASCADE)
     course_tb = ForeignKey(Courses, on_delete=CASCADE)
-    progress = PositiveSmallIntegerField(default=0,
-                                         validators=[MinValueValidator(0),
-                                                     MaxValueValidator(100)])
+    progress = FloatField(default=0,
+                          validators=[MinValueValidator(0),
+                                      MaxValueValidator(100)])
     is_finished = BooleanField(default=False)
     min_percent = PositiveSmallIntegerField(default=80,
                                             validators=
                                             [MinValueValidator(50),
                                              MaxValueValidator(100)])
-
-
-class Result(Model):
-    user = ForeignKey(Users, on_delete=CASCADE)
-    test = ForeignKey(Tests, on_delete=CASCADE, related_name='results_for_lesson')
-    is_finished = BooleanField(default=False)
-    creation_time = DateTimeField(auto_now_add=True)
-    upd_time = DateTimeField(auto_now=True)
-

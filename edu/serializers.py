@@ -1,22 +1,33 @@
 from rest_framework.serializers import *
 from rest_framework.serializers import CharField as CF, \
-    ImageField as IF, ChoiceField as Choice,\
+    ImageField as IF, IntegerField as INT,\
     ListField, DictField as DF
 from rest_framework.validators import UniqueValidator
 from materials.models import *
 
 
+def toFixed(numObj):
+    return f"{numObj:.{2}f}"
+
 # Done
 class CreateCourseSerializer(ModelSerializer):
+    class hide__:
+        def __init__(self, name, des, pr, minp):
+            self.course_name = name
+            self.description = des
+            self.preview = pr
+            self.min_percent = minp
+
     course_name = CF(max_length=25,
                      validators=[UniqueValidator(queryset=Courses.objects.all())],
                      label='Course name')
     description = CF(label='Description', validators=[UniqueValidator(queryset=Courses.objects.all())])
     preview = IF(label='Preview')
+    min_percent = INT()
 
     class Meta:
         model = Courses
-        fields = 'course_name', 'description', 'preview'
+        fields = 'course_name', 'description', 'preview', 'min_percent'
 
     def validate(self, data):
         if data.get('course_name') and data.get('description'):
@@ -28,15 +39,19 @@ class CreateCourseSerializer(ModelSerializer):
         course_name = validated_data.get('course_name')
         description = validated_data.get('description')
         preview = validated_data.get('preview')
+        per = validated_data.get('min_percent', None)
         course = Courses.objects.create(course_name=course_name, description=description, preview=preview)
-
-        for i in Users.objects.all():
-            rel = User2Course.objects.create(course_tb=course, user_tb=i)
-            rel.save()
+        if per:
+            for i in Users.objects.all():
+                rel = User2Course.objects.create(course_tb=course, user_tb=i, min_percent=per)
+                rel.save()
         else:
-            pass
+            for i in Users.objects.all():
+                rel = User2Course.objects.create(course_tb=course, user_tb=i)
+                rel.save()
         course.save()
-        return course
+        c = self.hide__(name=course.course_name, des=course.description, pr=course.preview, minp=course.user2course_set.all()[0].min_percent)
+        return c
 
 
 # Done
@@ -44,6 +59,7 @@ class EditCourseSerializer(CreateCourseSerializer):
     course_name = CF(label='Course_name', required=False)
     description = CF(label='Description', required=False)
     preview = IF(label='Preview', required=False)
+    min_percent = INT()
 
     def validate(self, data, *args, **kwargs):
         return data
@@ -52,28 +68,27 @@ class EditCourseSerializer(CreateCourseSerializer):
         instance.course_name = validated_data.get('course_name', instance.course_name)
         instance.description = validated_data.get('description', instance.description)
         instance.preview = validated_data.get('preview', instance.preview)
+        per = validated_data.get('min_percent', instance.user2course_set.all()[0].min_percent)
+        for i in instance.user2course_set.all():
+            i.min_percent = per
+            i.save()
         instance.save()
         return instance
 
 
-class CreateLessonSerializer(ModelSerializer):
-    LESSON_TYPES = [
-        ('1', 'Text'),
-        ('2', 'Audio'),
-        ('3', 'Video'),
-        ('4', 'Image')
-    ]
-    type = Choice(choices=LESSON_TYPES, default=1, label='Chose lesson type')
+class hide:
+    def __init__(self, description, text, image, tasks):
+        self.description=description
+        self.text=text
+        self.image=image
+        self.tasks=tasks
+
+class CreateLessonSerializer(Serializer):
     description = CF(max_length=40, required=True,
                      label='Meta info for lesson (e.g. "1.3 Present simple")', )
     text = CF(validators=[UniqueValidator(queryset=Lessons.objects.all())], required=True)
     image = ListField(label='Image files', required=False, child=IF())
     tasks = DF(required=True)
-
-    class Meta:
-        model = Lessons
-        fields = 'type', 'description', \
-                 'text', 'image', 'tasks'
 
     def validate(self, data):
         if data.get('description'):
@@ -82,25 +97,55 @@ class CreateLessonSerializer(ModelSerializer):
             return ValidationError('Description should not be blank')
 
     def create(self, validated_data):
-        type = validated_data.get('type')
         description = validated_data.get('description')
         course_id = Courses.objects.get(pk=self.context['course_id'])
         text = validated_data.get('text')
-        lesson = Lessons.objects.create(description=description, type=type,
+        lesson = Lessons.objects.create(description=description,
                                         course=course_id, text=text)
         test = Tests.objects.create(lesson=lesson)
-        tasks = validated_data.get('tasks')
+        tasks = validated_data.get('tasks')['tasks']
         for i in tasks:
-            task = Tasks.objects.create(type=i.get('type'), text=i.get('text'),
+            task = Tasks.objects.create(text=i.get('text'),
                                         variants='-+=+-'.join(i.get('var')),
-                                        answer=i.get('ans'))
-            test.tasks_for_tests.add(task)
+                                        answer=i.get('ans'),
+                                        test=test)
+            task.save()
         if validated_data.get('image'):
             for img in validated_data.pop('image'):
                 img_info = Image.objects.create(image=img)
                 lesson.image_material_for_lesson.add(img_info)
         lesson.save()
-        return lesson
+        less = hide(description=lesson.description, text=lesson.text,
+                    image={"images":[convert_to_txt(i.image.path) for i in lesson.image_material_for_lesson.all()]},
+                    tasks={"tasks":[i.text for i in lesson.tests.tasks_for_tests.all()]})
+        return less
+
+
+class hide_:
+    def __init__(self, test, res):
+        self.test = test
+        self.res = res
+
+class ProgressSerializer(ModelSerializer):
+    test = CF()
+    res = INT()
+
+    class Meta:
+        model = User2Course
+        fields = 'test', 'res'
+
+    def update(self, instance, validated_data):
+        lessons = len(instance.course_tb.lessons_set.all())
+        res = validated_data.get('res')
+        per = 100/lessons/10
+        instance.progress += float(toFixed(res*per))
+        if instance.progress >= instance.min_percent:
+            instance.is_finished = True
+        instance.save()
+        less = hide_(test=validated_data.get('test'), res=instance.progress)
+        return less
+
+
 
 # ================Get serializers==========================
 

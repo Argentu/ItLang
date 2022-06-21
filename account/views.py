@@ -1,5 +1,7 @@
 from base64 import b64decode
 import json
+from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
 from rest_framework.generics import *
 from rest_framework.permissions import *
@@ -13,7 +15,7 @@ def get_user_id_from_token(request):
     token = request.META.get('HTTP_AUTHORIZATION', None)
     token = token.replace('Token ', '')
     token = token.split('.')[1]
-    user_json = json.loads(b64decode(token))
+    user_json = json.loads(b64decode(token+'='))
     return user_json.get('user_id')
 
 
@@ -31,12 +33,14 @@ class RegisterApi(CreateAPIView):
     permission_classes = AllowAny,
     queryset = Users.objects.all()
     serializer_class = UserSerializer
+    parser_classes = MultiPartParser,
 
 
 class RegisterAdminApi(RegisterApi):
     permission_classes = IsAuthenticated, IsSuperUser
     queryset = Users.objects.all()
     serializer_class = RegisterAdminSerializer
+    parser_classes = JSONParser,
 
 
 class EditUserDataApi(RetrieveUpdateAPIView):
@@ -146,3 +150,19 @@ class GetBlogApi(APIView):
             'image': convert_to_txt(obj.image.path) if obj.image else None
         }
         return Response(res)
+
+
+class GetUserInfo(APIView):
+    def get(self, *args, **kwargs):
+        user = get_user_id_from_token(self.request)
+        user = Users.objects.get(pk=user)
+        user_data = {'username': user.username,
+                'firsr_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'ava': convert_to_txt(user.ava.path) if user.ava.path else None}
+        tmp = [(i.progress, i.course_tb.course_name) for i in user.user2course_set.all()]
+        dct = dict((y, x) for x, y in tmp)
+        user_data['courses'] = dct
+        return Response(user_data)
+
